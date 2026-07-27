@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fisher Tour - Login</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Inter:wght@400;600&display=swap');
+
+        body {
+            margin: 0; padding: 0;
+            font-family: 'Inter', sans-serif;
+            background-image: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)), url('/tela-login.jpg');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            display: flex; justify-content: center; align-items: center;
+            min-height: 100vh;
+        }
+
+        .app-container {
+            width: 100%; max-width: 400px;
+            background-color: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 40px 30px;
+            box-sizing: border-box;
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.3);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 30px;
+            color: #2c1a11;
+            margin-bottom: 25px;
+            text-align: center;
+        }
+
+        /* Estilo dos Inputs */
+        .input-group {
+            position: relative;
+            margin-bottom: 20px;
+        }
+
+        .input-group i {
+            position: absolute;
+            left: 0; top: 12px;
+            font-size: 16px; color: #555;
+            font-style: normal;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 12px 10px 12px 30px;
+            border: none;
+            border-bottom: 1px solid #ccc;
+            background: transparent;
+            font-size: 14px;
+            box-sizing: border-box;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+
+        .input-group input:focus {
+            border-bottom: 2px solid #002147;
+        }
+
+        /* Links e Botões */
+        .forgot-password {
+            display: block; text-align: right;
+            font-size: 12px; color: #777;
+            text-decoration: none; margin-top: -10px; margin-bottom: 25px;
+        }
+
+        .btn-primary {
+            width: 100%; 
+            padding: 14px;
+            background-color: #002147;
+            color: white; 
+            border: none;
+            border-radius: 30px; 
+            font-size: 15px; 
+            font-weight: 600;
+            cursor: pointer; 
+            margin-bottom: 15px;
+            box-sizing: border-box;
+            transition: opacity 0.3s;
+        }
+
+        .divider {
+            text-align: center; 
+            font-size: 12px; 
+            color: #999;
+            margin: 15px 0; 
+        }
+
+        .btn-google {
+            width: 100%; 
+            padding: 12px;
+            background-color: #ffffff;
+            color: #333; 
+            border: 1px solid #ddd;
+            border-radius: 30px; 
+            font-size: 14px; 
+            font-weight: 600;
+            cursor: pointer; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            gap: 12px;
+            margin-bottom: 25px;
+            text-decoration: none;
+            box-sizing: border-box;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+
+        .btn-google svg {
+            width: 18px;
+            height: 18px;
+        }
+
+        .toggle-link {
+            text-align: center; font-size: 13px; color: #555;
+        }
+
+        .toggle-link a {
+            color: #2c1a11; font-weight: 600; text-decoration: underline; cursor: pointer;
+        }
+
+        #form-cadastro { display: none; }
+    </style>
+</head>
+<body>
+
+<div class="app-container">
+
+    <!-- TELA DE LOGIN -->
+    <div id="form-login">
+        <h1>Login</h1>
+        
+        <p th:if="${erro}" th:text="${erro}" style="color: red; text-align: center; font-size: 14px;"></p>
+
+        <form action="/entrar" method="POST">
+            <div class="input-group">
+                <i>@</i>
+                <input type="email" name="email" placeholder="Digite seu email" required>
+            </div>
+            
+            <div class="input-group">
+                <i>🔒</i>
+                <input type="password" name="senha" placeholder="Digite sua senha" required>
+            </div>
+            
+            <a href="/recuperar-senha" class="forgot-password">Esqueceu a senha?</a>
+            
+            <button type="submit" class="btn-primary">Acessar</button>
+        </form>
+        
+        <div class="divider">OU</div>
+        
+        <a href="/oauth2/authorization/google" class="btn-google">
+            <svg viewBox="0 0 24 24">
+                <path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.66-5.17 3.66-9.17z"/>
+                <path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.13 0-5.78-2.11-6.73-4.96H1.19v3.15C3.18 21.2 7.24 24 12 24z"/>
+                <path fill="#FBBC05" d="M5.27 14.24c-.25-.72-.38-1.49-.38-2.24s.13-1.52.38-2.24V6.6H1.19C.43 8.13 0 9.87 0 12s.43 3.87 1.19 5.4l4.08-3.16z"/>
+                <path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.24 0 3.18 2.8 1.19 6.6l4.08 3.16c.95-2.85 3.6-4.96 6.73-4.96z"/>
+            </svg>
+            Entrar com Google
+        </a>
+        
+        <div class="toggle-link">
+            Ainda não possui uma conta? <a onclick="alternarTelas()">Cadastre-se</a>
+        </div>
+    </div>
+
+    <!-- TELA DE CADASTRO -->
+    <div id="form-cadastro">
+        <h1>Cadastro</h1>
+        
+        <form action="/cadastrar" method="POST">
+            <div class="input-group">
+                <i>👤</i>
+                <input type="text" name="nomeCompleto" placeholder="Digite seu nome completo" required>
+            </div>
+
+            <div class="input-group">
+                <i>@</i>
+                <input type="email" name="email" placeholder="Digite seu email" required>
+            </div>
+            
+            <div class="input-group">
+                <i>🔒</i>
+                <input type="password" name="senha" placeholder="Digite sua senha" required>
+            </div>
+
+            <div class="input-group">
+                <i>📅</i>
+                <input type="number" name="idade" placeholder="Digite sua idade" required>
+            </div>
+
+            <div class="input-group">
+                <i>🗓️</i>
+                <input type="text" name="dataNascimento" placeholder="Data de nascimento (Ex: 01/01/2000)" required>
+            </div>
+
+            <div class="input-group">
+                <i>🆔</i>
+                <input type="text" name="cpf" placeholder="Digite seu CPF" required>
+            </div>
+
+            <div class="input-group">
+                <i>🏠</i>
+                <input type="text" name="endereco" placeholder="Digite seu endereço" required>
+            </div>
+
+            <div class="input-group">
+                <i>📍</i>
+                <input type="text" name="cep" placeholder="Digite seu CEP" required>
+            </div>
+            
+            <button type="submit" class="btn-primary" style="margin-top: 15px;">Cadastrar</button>
+        </form>
+        
+        <div class="divider">OU</div>
+        
+        <a href="/oauth2/authorization/google" class="btn-google">
+            <svg viewBox="0 0 24 24">
+                <path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.66-5.17 3.66-9.17z"/>
+                <path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.13 0-5.78-2.11-6.73-4.96H1.19v3.15C3.18 21.2 7.24 24 12 24z"/>
+                <path fill="#FBBC05" d="M5.27 14.24c-.25-.72-.38-1.49-.38-2.24s.13-1.52.38-2.24V6.6H1.19C.43 8.13 0 9.87 0 12s.43 3.87 1.19 5.4l4.08-3.16z"/>
+                <path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.24 0 3.18 2.8 1.19 6.6l4.08 3.16c.95-2.85 3.6-4.96 6.73-4.96z"/>
+            </svg>
+            Entrar com Google
+        </a>
+        
+        <div class="toggle-link">
+            Já possui uma conta? <a onclick="alternarTelas()">Faça o login</a>
+        </div>
+    </div>
+
+</div>
+
+<script>
+    function alternarTelas() {
+        const telaLogin = document.getElementById('form-login');
+        const telaCadastro = document.getElementById('form-cadastro');
+        
+        if (telaLogin.style.display === 'none') {
+            telaLogin.style.display = 'block';
+            telaCadastro.style.display = 'none';
+        } else {
+            telaLogin.style.display = 'none';
+            telaCadastro.style.display = 'block';
+        }
+    }
+
+    document.querySelectorAll('form').forEach(formulario => {
+        formulario.addEventListener('submit', function(event) {
+            const botao = this.querySelector('button[type="submit"]');
+            botao.innerHTML = 'Aguarde... ⏳';
+            botao.style.opacity = '0.7';
+            botao.style.cursor = 'wait';
+        });
+    });
+</script>
+
+</body>
+</html>

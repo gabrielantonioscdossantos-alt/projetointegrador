@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fisher Tour - Tocantins</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Inter:wght@400;600&display=swap');
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', sans-serif;
+            background-color: #fbf9f6;
+            color: #2c1a11;
+        }
+
+        .app-container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: #fbf9f6;
+            min-height: 100vh;
+            position: relative;
+            padding-bottom: 90px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.05);
+        }
+
+        /* Barra Superior Fixa (Menu Esquerdo e Perfil Direito) */
+        .top-bar {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            right: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .icon-btn, .user-btn {
+            background-color: rgba(0, 0, 0, 0.6);
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 30px;
+            cursor: pointer;
+            font-family: 'Inter', sans-serif;
+            font-weight: 600;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            backdrop-filter: blur(5px);
+            transition: background 0.2s;
+        }
+
+        .icon-btn:hover, .user-btn:hover {
+            background-color: rgba(0, 0, 0, 0.8);
+        }
+
+        .icon-btn {
+            font-size: 18px;
+            padding: 8px 14px;
+        }
+
+        /* Estilo dos menus dropdown */
+        .dropdown-menu {
+            position: absolute;
+            top: 50px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.15);
+            overflow: hidden;
+            width: 200px;
+            display: none;
+            flex-direction: column;
+        }
+
+        .menu-container { position: relative; }
+        .user-container { position: relative; }
+
+        .menu-container .dropdown-menu { left: 0; }
+        .user-container .dropdown-menu { right: 0; }
+
+        .dropdown-menu a {
+            padding: 12px 16px;
+            color: #2c1a11;
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 600;
+            border-bottom: 1px solid #f0f0f0;
+            transition: background 0.2s;
+        }
+
+        .dropdown-menu a:hover {
+            background-color: #f8f5f0;
+        }
+
+        /* Seção do Topo (Hero) com a foto do Jalapão */
+        .hero {
+            background-image: linear-gradient(to bottom, rgba(0,0,0,0.2), rgba(0,0,0,0.7)), url('/fundo-jalapao.jpg');
+            background-size: cover;
+            background-position: center;
+            height: 380px;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            padding: 40px;
+        }
+        .hero h4 { margin: 0; font-size: 14px; font-weight: normal; letter-spacing: 2px; }
+        .hero h1 { margin: 5px 0; font-family: 'Playfair Display', serif; font-size: 48px; }
+        .hero p { margin: 0; font-size: 18px; opacity: 0.9; }
+
+        /* Alerta Vermelho */
+        .alert-box {
+            background-color: #c62828;
+            color: white;
+            margin: 30px 40px;
+            padding: 20px;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            cursor: pointer;
+        }
+        .alert-box div { font-weight: 600; font-size: 16px; }
+        .alert-box small { font-weight: 400; font-size: 14px; display: block; margin-top: 4px; }
+        .alert-box span { font-size: 20px; font-weight: bold; }
+
+        /* Ligação Rápida */
+        .section-title { font-family: 'Playfair Display', serif; font-size: 24px; margin: 30px 40px 15px 40px; color: #2c1a11; }
+        
+        .quick-calls { display: flex; gap: 20px; padding: 0 40px; }
+        .call-card { 
+            flex: 1; padding: 25px; text-align: center; border-radius: 16px; 
+            display: flex; flex-direction: column; justify-content: center;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.03);
+        }
+        .call-card h2 { margin: 0; font-size: 32px; }
+        .call-card span { font-size: 14px; margin-top: 8px; color: #555; font-weight: 600; }
+        .bg-blue { background-color: #e3f2fd; }
+        .bg-orange { background-color: #fbe9e7; }
+        .bg-red { background-color: #ffebee; }
+
+        /* Destinos */
+        .destinos-header { display: flex; justify-content: space-between; align-items: baseline; margin: 40px 40px 15px 40px; }
+        .destinos-header h3 { font-family: 'Playfair Display', serif; font-size: 24px; margin: 0; color: #2c1a11;}
+        .destinos-header span { font-size: 14px; color: #888; }
+        
+        .destinos-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            padding: 0 40px;
+        }
+        .destino-card {
+            background: white; border-radius: 16px;
+            overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.05); position: relative;
+        }
+        .destino-card img { width: 100%; height: 160px; object-fit: cover; }
+        .badge {
+            position: absolute; top: 12px; left: 12px; color: white;
+            font-size: 11px; padding: 5px 10px; border-radius: 20px; font-weight: bold;
+        }
+        .destino-info { padding: 16px; }
+        .destino-info h4 { margin: 0; font-size: 18px; color: #333; }
+        .destino-info p { margin: 6px 0 0; font-size: 13px; color: #777; }
+
+        /* Menu Inferior Fixo */
+        .bottom-nav {
+            position: fixed; bottom: 0; left: 0; width: 100%; background: white;
+            display: flex; justify-content: center; gap: 60px; padding: 15px 0;
+            box-shadow: 0 -4px 15px rgba(0,0,0,0.05); border-radius: 20px 20px 0 0;
+            z-index: 100;
+        }
+        .nav-item { text-align: center; color: #888; font-size: 12px; display: flex; flex-direction: column; align-items: center; cursor: pointer;}
+        .nav-item.active { color: #c62828; }
+        .nav-item i { font-size: 22px; margin-bottom: 4px; }
+    </style>
+</head>
+<body>
+
+<div class="app-container">
+
+    <!-- BARRA SUPERIOR (Menu Hambúrguer Esquerda & Perfil Direita) -->
+    <header class="top-bar">
+        <!-- 1. Menu Hambúrguer (Esquerda) -->
+        <div class="menu-container">
+            <button onclick="toggleMenuLateral()" class="icon-btn">☰</button>
+            <div id="menu-lateral" class="dropdown-menu">
+                <a href="/">Início</a>
+                <a href="#">Emergência</a>
+                <a href="#">Cidades</a>
+                <a href="#">Guia</a>
+            </div>
+        </div>
+
+        <!-- 2. Menu do Usuário com Nome e Opções (Direita) -->
+        <div class="user-container">
+            <button onclick="toggleMenuUser()" class="user-btn">
+                👤 <span th:text="${session.usuarioLogado != null ? session.usuarioLogado.nomeCompleto : 'Minha Conta'}">Nome do Usuário</span> ▾
+            </button>
+            <div id="menu-user" class="dropdown-menu">
+                <a href="/informacoes-pessoais">Informações Pessoais</a>
+                <a href="/logout">Sair da conta</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Cabeçalho com o Jalapão -->
+    <header class="hero">
+        <h4>BEM-VINDO AO</h4>
+        <h1>Tocantins</h1>
+        <p>Natureza, história e cultura no coração do Brasil</p>
+    </header>
+
+    <!-- Alerta -->
+    <section class="alert-box">
+        <div>
+            Precisa de ajuda urgente?
+            <small>Acesse os números de emergência</small>
+        </div>
+        <span>></span>
+    </section>
+
+    <!-- Ligação Rápida -->
+    <h3 class="section-title">Ligação Rápida</h3>
+    <section class="quick-calls">
+        <div class="call-card bg-blue">
+            <h2 style="color: #0d47a1;">190</h2>
+            <span>Polícia</span>
+        </div>
+        <div class="call-card bg-orange">
+            <h2 style="color: #bf360c;">192</h2>
+            <span>SAMU</span>
+        </div>
+        <div class="call-card bg-red">
+            <h2 style="color: #c62828;">193</h2>
+            <span>Bombeiros</span>
+        </div>
+    </section>
+
+    <!-- Destinos -->
+    <div class="destinos-header">
+        <h3>Destinos em Destaque</h3>
+        <span>5 cidades</span>
+    </div>
+    <section class="destinos-grid">
+        <div class="destino-card">
+            <span class="badge" style="background-color: #2e7d32;">Capital</span>
+            <img src="https://images.unsplash.com/photo-1596422846543-75c6fc197f07?auto=format&fit=crop&w=600&q=80" alt="Palmas">
+            <div class="destino-info">
+                <h4>Palmas</h4>
+                <p>Capital do Tocantins</p>
+            </div>
+        </div>
+        <div class="destino-card">
+            <span class="badge" style="background-color: #d84315;">Natureza</span>
+            <img src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=600&q=80" alt="Jalapão">
+            <div class="destino-info">
+                <h4>Jalapão</h4>
+                <p>Paraíso do Cerrado</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Menu Inferior -->
+    <nav class="bottom-nav">
+        <div class="nav-item active">
+            <i>🏠</i>
+            <span>Início</span>
+        </div>
+        <div class="nav-item">
+            <i>⚠️</i>
+            <span>Emergência</span>
+        </div>
+        <div class="nav-item">
+            <i>📍</i>
+            <span>Cidades</span>
+        </div>
+        <div class="nav-item">
+            <i>🧭</i>
+            <span>Guia</span>
+        </div>
+    </nav>
+</div>
+
+<!-- ========================================== -->
+<!-- INTEGRAÇÃO DE ACESSIBILIDADE (Libras e Cores) -->
+<!-- ========================================== -->
+
+<!-- Widget do VLibras (Linguagem de Sinais) -->
+<div vw class="enabled">
+    <div vw-access-button class="active"></div>
+    <div vw-plugin-wrapper>
+        <div class="plugin-wrapper"></div>
+    </div>
+</div>
+<script src="https://vlibras.gov.br/app/vlibras-plugin.js"></script>
+<script>
+    new window.VLibras.Widget('https://vlibras.gov.br/app');
+</script>
+
+<!-- Menu Flutuante para Daltonismo e Contraste -->
+<div id="accessibility-menu" style="position: fixed; top: 80px; right: 20px; z-index: 9999;">
+    <button onclick="toggleAcessibilidade()" style="background: #002147; color: white; border: none; padding: 10px 15px; border-radius: 50px; cursor: pointer; font-weight: bold; box-shadow: 0 4px 10px rgba(0,0,0,0.2);">
+        ♿ Acessibilidade
+    </button>
+    <div id="accessibility-options" style="display: none; background: white; padding: 15px; border-radius: 10px; box-shadow: 0 5px 15px rgba(0,0,0,0.2); margin-top: 10px; width: 180px;">
+        <p style="margin: 0 0 10px 0; font-size: 13px; font-weight: bold; color: #333;">Modos Visuais:</p>
+        <button onclick="alternarContraste()" style="width: 100%; margin-bottom: 5px; padding: 8px; background: #eee; border: none; border-radius: 5px; cursor: pointer; font-size: 12px;">Alto Contraste</button>
+        <button onclick="alternarEscalaCinza()" style="width: 100%; padding: 8px; background: #eee; border: none; border-radius: 5px; cursor: pointer; font-size: 12px;">Filtro Daltonismo/P&B</button>
+    </div>
+</div>
+
+<script>
+    // Funções para abrir/fechar os menus superiores
+    function toggleMenuLateral() {
+        const menu = document.getElementById('menu-lateral');
+        const userMenu = document.getElementById('menu-user');
+        userMenu.style.display = 'none';
+        menu.style.display = menu.style.display === 'flex' ? 'none' : 'flex';
+    }
+
+    function toggleMenuUser() {
+        const userMenu = document.getElementById('menu-user');
+        const lateralMenu = document.getElementById('menu-lateral');
+        lateralMenu.style.display = 'none';
+        userMenu.style.display = userMenu.style.display === 'flex' ? 'none' : 'flex';
+    }
+
+    // Fecha os menus ao clicar fora
+    window.onclick = function(event) {
+        if (!event.target.closest('.menu-container') && !event.target.closest('.user-container')) {
+            document.getElementById('menu-lateral').style.display = 'none';
+            document.getElementById('menu-user').style.display = 'none';
+        }
+    }
+
+    function toggleAcessibilidade() {
+        const menu = document.getElementById('accessibility-options');
+        menu.style.display = menu.style.display === 'none' ? 'block' : 'none';
+    }
+
+    function alternarContraste() {
+        document.body.style.backgroundColor = document.body.style.backgroundColor === 'black' ? '#fbf9f6' : 'black';
+        document.body.style.color = document.body.style.color === 'yellow' ? '#2c1a11' : 'yellow';
+    }
+
+    function alternarEscalaCinza() {
+        const atual = document.body.style.filter;
+        document.body.style.filter = atual === 'grayscale(100%)' ? 'none' : 'grayscale(100%)';
+    }
+</script>
+
+</body>
+</html>
